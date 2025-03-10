@@ -6,9 +6,31 @@ import { useActiveTab } from './hooks/useActiveTab';
 import { useBookmarks } from './hooks/useBookmarks';
 import { useScrolling } from './hooks/useScrolling';
 import { useSelectionMode } from './hooks/useSelectionMode';
+import endpoints from './resources/endpoints.json';
+import { env as Environment } from './types/env';
 import './styles/popup.css';
 
+// Regex to match TikTok video pages
 const tiktokVideoRegex = /^https:\/\/www\.tiktok\.com\/[^/]+\/[^/]+\/\d+/;
+
+// Get the injected environment variable
+const envVar = process.env.REACT_APP_DEPLOY_ENV;
+console.log("process.env.REACT_APP_DEPLOY_ENV:", envVar);
+
+// Map the value explicitly using our enum.
+// If envVar equals 'dev' or 'test', we use that; otherwise, we default to 'production'.
+const currentEnv: Environment =
+  envVar === Environment.DEV
+    ? Environment.DEV
+    : envVar === Environment.TEST
+    ? Environment.TEST
+    : Environment.PRODUCTION;
+
+console.log("Mapped environment:", currentEnv);
+
+// Now pick the URL from our JSON file
+const DOWNLOAD_URL = endpoints.frontend_endpoints[currentEnv];
+console.log("Download URL:", DOWNLOAD_URL);
 
 const Popup: React.FC = () => {
   const { activeUrl } = useActiveTab();
@@ -48,10 +70,9 @@ const Popup: React.FC = () => {
       .catch(err => console.error("Error collecting video links:", err));
   };
 
-  // New function to handle Download button click
   const handleDownloadClick = () => {
-    // Open the React website
-    browser.tabs.create({ url: 'https://tiktokze.com' })
+    // Use the URL from our JSON file (which should be localhost:3000 when in dev mode)
+    browser.tabs.create({ url: DOWNLOAD_URL })
       .then(tab => {
         // Delay sending data to allow the page to load
         setTimeout(() => {
@@ -61,26 +82,26 @@ const Popup: React.FC = () => {
           }
         }, 2000); // Adjust delay as needed
       })
-      .catch(err => console.error("Error opening tiktokze.com:", err));
+      .catch(err => console.error("Error opening endpoint:", err));
   };
 
   return (
     <div className={isDarkMode ? "dark" : ""}>
       <div className="popup-container">
         <div className="top-row">
-          {/* Theme toggle button */}
+          {/* Theme toggle */}
           <button onClick={toggleTheme} className="theme-toggle-button">
             {isDarkMode ? <Sun /> : <Moon />}
           </button>
-          {/* New Download button */}
+          {/* Download button */}
           <button onClick={handleDownloadClick} className="theme-toggle-button">
-          <Download />
+            <Download />
           </button>
-          {/* Clear all bookmarks */}
+          {/* Clear bookmarks */}
           <button onClick={clearBookmarks} className="btn">
             Clear selection
           </button>
-          {/* Scroll start/stop/resume */}
+          {/* Scrolling controls */}
           {isTikTokDomain && !isVideoPage && !isSelecting && scrollStatus === 'idle' && (
             <button onClick={startScrolling} className="btn">
               Start Scrolling
@@ -97,7 +118,7 @@ const Popup: React.FC = () => {
               Bookmark
             </button>
           )}
-          {/* Bookmark all or enter select mode */}
+          {/* Bookmark all or select mode */}
           {isTikTokDomain && !isVideoPage && !isSelecting && (
             <>
               <button onClick={handleBookmarkAll} className="btn">
@@ -121,7 +142,7 @@ const Popup: React.FC = () => {
           )}
         </div>
 
-        {/* Scrolling timer display */}
+        {/* Scrolling timer */}
         {scrollStatus !== 'idle' && (
           <div className="scroll-timer">
             Time until next scroll: {timeRemaining} seconds

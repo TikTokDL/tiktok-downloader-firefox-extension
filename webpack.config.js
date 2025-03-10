@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 
 module.exports = {
   entry: {
@@ -6,7 +7,7 @@ module.exports = {
     content: './src/content.ts'
   },
   output: {
-    filename: '[name].js', // Will output popup.js and content.js in the dist folder
+    filename: '[name].js', // Outputs popup.js and content.js in the dist folder
     path: path.resolve(__dirname, 'dist')
   },
   resolve: {
@@ -28,5 +29,10 @@ module.exports = {
       }
     ]
   },
+  plugins: [
+    new webpack.DefinePlugin({
+      'process.env.REACT_APP_DEPLOY_ENV': JSON.stringify(process.env.REACT_APP_DEPLOY_ENV || 'production')
+    })
+  ],
   mode: 'production'
 };
