@@ -122,7 +122,7 @@ function sendTimeUpdate(sec: number) {
 /**
  * Single message listener
  */
-browser.runtime.onMessage.addListener((message: any, _sender, sendResponse) => {
+browser.runtime.onMessage.addListener((message: any, _sender: any, sendResponse: any) => {
   if (message.action === "startScrolling") {
     initScrollVars();
     startScrolling();
@@ -176,7 +176,7 @@ browser.runtime.onMessage.addListener((message: any, _sender, sendResponse) => {
   return true;
 });
 
-browser.runtime.onMessage.addListener((message: any, sender, sendResponse): true => {
+browser.runtime.onMessage.addListener((message: any, sender: any, sendResponse: any): true => {
   if (message.action === 'extensionData') {
     // Forward the data to the webpage
     window.postMessage({ source: 'myExtension', payload: message.payload }, '*');

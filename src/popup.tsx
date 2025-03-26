@@ -48,10 +48,9 @@ const Popup: React.FC = () => {
       .catch(err => console.error("Error collecting video links:", err));
   };
 
-  // New function to handle Download button click
+  // Updated function to handle Download button click using the injected ENDPOINT
   const handleDownloadClick = () => {
-    // Open the React website
-    browser.tabs.create({ url: 'https://tiktokze.com' })
+    browser.tabs.create({ url: ENDPOINT })
       .then(tab => {
         // Delay sending data to allow the page to load
         setTimeout(() => {
@@ -61,7 +60,7 @@ const Popup: React.FC = () => {
           }
         }, 2000); // Adjust delay as needed
       })
-      .catch(err => console.error("Error opening tiktokze.com:", err));
+      .catch(err => console.error("Error opening endpoint:", err));
   };
 
   return (
@@ -72,9 +71,9 @@ const Popup: React.FC = () => {
           <button onClick={toggleTheme} className="theme-toggle-button">
             {isDarkMode ? <Sun /> : <Moon />}
           </button>
-          {/* New Download button */}
+          {/* Download button using injected endpoint */}
           <button onClick={handleDownloadClick} className="theme-toggle-button">
-          <Download />
+            <Download />
           </button>
           {/* Clear all bookmarks */}
           <button onClick={clearBookmarks} className="btn">

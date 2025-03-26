@@ -1,4 +1,10 @@
 const path = require('path');
+const webpack = require('webpack');
+const envConfig = require('./env.config');
+
+// Get the target environment; default to 'development'
+const env = process.env.TIKTOKZE_ENV || 'development';
+const endpoint = envConfig[env].endpoint;
 
 module.exports = {
   entry: {
@@ -6,8 +12,8 @@ module.exports = {
     content: './src/content.ts'
   },
   output: {
-    filename: '[name].js', // Will output popup.js and content.js in the dist folder
-    path: path.resolve(__dirname, 'dist')
+    path: path.resolve(__dirname, 'dist'),
+    filename: '[name].js'
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js']
@@ -16,17 +22,18 @@ module.exports = {
     rules: [
       {
         test: /\.tsx?$/,
-        use: 'ts-loader',
+        loader: 'ts-loader',
         exclude: /node_modules/
       },
       {
         test: /\.css$/,
-        use: [
-          'style-loader', // Injects CSS into the DOM
-          'css-loader'    // Translates CSS into modules
-        ]
+        use: ['style-loader', 'css-loader']
       }
     ]
   },
-  mode: 'production'
+  plugins: [
+    new webpack.DefinePlugin({
+      ENDPOINT: JSON.stringify(endpoint)
+    })
+  ]
 };
